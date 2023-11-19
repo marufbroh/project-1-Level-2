@@ -2,7 +2,7 @@ import express, { NextFunction, Request, Response } from "express"
 const app = express()
 const port = 3000
 
-// middleware
+// parsers
 app.use(express.json());
 app.use(express.text());
 
@@ -36,22 +36,51 @@ courseRouter.post("/create-course", (req: Request, res: Response) => {
 
 
 const logger = (req: Request, res: Response, next: NextFunction) => {
-    console.log(req.url, req.hostname, req.method);
+    // console.log(req.url, req.hostname, req.method);
     next();
 }
 
-app.get('/', logger, (req: Request, res: Response) => {
-    // console.log(req.params.userId, req.params.subId);
-    const query = req.query;
-    console.log(query);
-    res.send('Hello Developer Tamim Iqbal Marufff!')
+app.get('/', logger, async (req: Request, res: Response, next: NextFunction) => {
+
+    try {
+        res.send(bongbang)
+    }
+    catch (error) {
+        next(error)
+        // res.status(400).json({
+        //     success: false,
+        //     message: "Failed to get data",
+        // })
+    }
 })
 
-app.post("/anything", logger, (req: Request, res: Response) => {
+app.get("/anything", logger, (req: Request, res: Response) => {
     console.log(req.body);
     res.json({
         message: "Successfully have the data"
     })
 })
+
+
+
+app.all("*", (req: Request, res: Response) => {
+    res.status(400).json({
+        success: false,
+        message: "Route not found"
+    })
+})
+
+
+// global error handler
+app.use((error: any, req: Request, res: Response, next: NextFunction) => {
+    if (error) {
+        res.status(400).json({
+            success: false,
+            message: "Something went wrong",
+        })
+    }
+})
+
+
 
 export default app;
